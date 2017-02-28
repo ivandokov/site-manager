@@ -18,6 +18,9 @@ echo "xdebug.remote_port = 9000" | sudo tee -a /etc/php/7.1/mods-available/xdebu
 echo "xdebug.max_nesting_level = 512" | sudo tee -a /etc/php/7.1/mods-available/xdebug.ini
 echo "opcache.revalidate_freq = 0" | sudo tee -a /etc/php/7.1/mods-available/opcache.ini
 
+msg "Turning on display errors"
+sudo sed -i "s/display_errors = .*/display_errors = On/" /etc/php/7.1/cli/php.ini
+
 # Disable xdebug for cli
 #sudo phpdismod -s cli xdebug
 
