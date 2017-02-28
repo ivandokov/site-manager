@@ -6,7 +6,7 @@ function askForDomain {
         if [ -z "${DOMAIN}" ]; then
             read -p "Website domain: " DOMAIN
         elif ! echo "${DOMAIN}" | grep -qP '(?=^.{5,254}$)(^(?:(?!\d+\.)[a-zA-Z0-9_\-]{1,63}\.?)+(?:[a-zA-Z]{2,})$)'; then
-            echo "This is not a valid domain name"
+            echo "This is not a valid domain name (domain.ltd)"
             read -p "Website domain: " DOMAIN
         else
             break
@@ -172,6 +172,6 @@ EOF
         fi
         ;;
     *)
-        echo "Usage: create|delete|enable|disable domain-name.tld"
+        echo "Usage: create|delete|enable|disable domain.tld"
         ;;
 esac
