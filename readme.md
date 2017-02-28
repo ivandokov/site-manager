@@ -18,3 +18,25 @@ To make the `site.sh` file globally accessible run:
 ```bash
 sudo ln -s $(pwd)/site.sh /usr/local/bin/site
 ```
+
+## Usage
+
+Creates system user, website root, logs and webroot directories, nginx and php-fpm configurations
+```bash
+site create domain.tld
+```
+
+Deletes nginx and php-fpm configurations and optionally deletes the system user and website files
+```bash
+site delete domain.tld
+```
+
+Enables nginx virtual host and php-fpm workers
+```bash
+site enable domain.tld
+```
+
+Disables nginx virtual host and php-fpm workers
+```bash
+site disable domain.tld
+```
