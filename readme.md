@@ -6,17 +6,17 @@ The installer is going to setup latest stable versions of nginx and php
 ```bash
 git clone https://github.com/ivandokov/site.git
 cd site
-./install-server.sh
+./install-server
 ```
 
 If you want to install xdebug you can run:
 ```bash
-./install-xdebug.sh
+./install-xdebug
 ```
 
-To make the `site.sh` file globally accessible run:
+To make the `site` file globally accessible run:
 ```bash
-sudo ln -s $(pwd)/site.sh /usr/local/bin/site
+sudo ln -s $(pwd)/site /usr/local/bin/site
 ```
 
 ## Usage
