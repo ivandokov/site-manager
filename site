@@ -21,9 +21,27 @@ function askForDomain {
     fi
 }
 
+function askForMaxFpmWorkers {
+    MAX_WORKERS="$1"
+    while true; do
+        if [ -z "${MAX_WORKERS}" ]; then
+            read -p "Maximum php-fpm workers [5]: " MAX_WORKERS
+            if [ -z "${MAX_WORKERS}" ]; then
+                MAX_WORKERS=5
+            fi
+        elif [ "${MAX_WORKERS}" -lt 3 ]; then
+            echo "Maximum php-fpm workers cannot be lower than 3"
+            MAX_WORKERS=
+        else
+            break
+        fi
+    done
+}
+
 case $1 in
     create)
         askForDomain $2
+        askForMaxFpmWorkers $3
 
         SITEROOT=/var/www/${DOMAIN}
         WEBROOT=/var/www/${DOMAIN}/www/public
@@ -97,13 +115,13 @@ listen = ${FPM_SOCKET}
 listen.owner = www-data
 listen.group = www-data
 pm = dynamic
-pm.max_children = 10
+pm.max_children = ${MAX_WORKERS}
 pm.start_servers = 2
 pm.min_spare_servers = 1
 pm.max_spare_servers = 3
 pm.max_requests = 500
 ;php_flag[display_errors] = off
-php_admin_value[error_log] = ${SITE}/logs/php-error.log
+php_admin_value[error_log] = ${SITEROOT}/logs/php-error.log
 php_admin_flag[log_errors] = on
 ;php_admin_value[memory_limit] = 512M
 EOF
