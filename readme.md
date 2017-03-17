@@ -23,20 +23,20 @@ sudo ln -s $(pwd)/site /usr/local/bin/site
 
 Creates system user, website root, logs and webroot directories, nginx and php-fpm configurations
 ```bash
-site create domain.tld
+site create [domain.tld] [max-fpm-workers]
 ```
 
 Deletes nginx and php-fpm configurations and optionally deletes the system user and website files
 ```bash
-site delete domain.tld
+site delete [domain.tld] [max-fpm-workers]
 ```
 
 Enables nginx virtual host and php-fpm workers
 ```bash
-site enable domain.tld
+site enable [domain.tld] [max-fpm-workers]
 ```
 
 Disables nginx virtual host and php-fpm workers
 ```bash
-site disable domain.tld
+site disable [domain.tld] [max-fpm-workers]
 ```
