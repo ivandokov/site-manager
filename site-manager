@@ -46,7 +46,7 @@ case $1 in
         SITEROOT=/var/www/${DOMAIN}
         WEBROOT=/var/www/${DOMAIN}/www/public
         FPM_SOCKET=/var/run/php/${DOMAIN}.sock
-        PHP_POOL=/etc/php/7.1/fpm/pool.d/${DOMAIN}.conf
+        PHP_POOL=/etc/php/7.2/fpm/pool.d/${DOMAIN}.conf
 
         if ! getent passwd ${DOMAIN} > /dev/null; then
             echo "Creating system user ${DOMAIN}"
@@ -134,7 +134,7 @@ EOF
 
         echo "Restarting services"
         sudo service nginx reload > /dev/null
-	    sudo service php7.1-fpm restart > /dev/null
+	    sudo service php7.2-fpm restart > /dev/null
         ;;
     delete)
         askForDomain $2
@@ -147,10 +147,10 @@ EOF
 
         sudo rm /etc/nginx/sites-available/${DOMAIN}.conf
         sudo rm /etc/nginx/sites-enabled/${DOMAIN}.conf
-        sudo rm /etc/php/7.1/fpm/pool.d/${DOMAIN}.conf
+        sudo rm /etc/php/7.2/fpm/pool.d/${DOMAIN}.conf
         echo "Deleted configurations for ${DOMAIN}"
         sudo service nginx reload
-        sudo service php7.1-fpm reload
+        sudo service php7.2-fpm reload
 
         read -p "Do you want to DELETE site files? [y/n]: " yn
         if [ "${yn}" == "y" ]; then
@@ -168,9 +168,9 @@ EOF
             echo "Cannot find nginx configuration file for ${DOMAIN}"
         fi
 
-        if [ -f /etc/php/7.1/fpm/pool.d/${DOMAIN}.conf.disabled ]; then
-            sudo mv /etc/php/7.1/fpm/pool.d/${DOMAIN}.conf.disabled /etc/php/7.1/fpm/pool.d/${DOMAIN}.conf
-            sudo service php7.1-fpm reload
+        if [ -f /etc/php/7.2/fpm/pool.d/${DOMAIN}.conf.disabled ]; then
+            sudo mv /etc/php/7.2/fpm/pool.d/${DOMAIN}.conf.disabled /etc/php/7.2/fpm/pool.d/${DOMAIN}.conf
+            sudo service php7.2-fpm reload
         else
             echo "Cannot find php-fpm configuration file for ${DOMAIN}"
         fi
@@ -184,9 +184,9 @@ EOF
             echo "Cannot find nginx configuration file for ${DOMAIN}"
         fi
 
-        if [ -f /etc/php/7.1/fpm/pool.d/${DOMAIN}.conf ]; then
-            sudo mv /etc/php/7.1/fpm/pool.d/${DOMAIN}.conf /etc/php/7.1/fpm/pool.d/${DOMAIN}.conf.disabled
-            sudo service php7.1-fpm reload
+        if [ -f /etc/php/7.2/fpm/pool.d/${DOMAIN}.conf ]; then
+            sudo mv /etc/php/7.2/fpm/pool.d/${DOMAIN}.conf /etc/php/7.2/fpm/pool.d/${DOMAIN}.conf.disabled
+            sudo service php7.2-fpm reload
         else
             echo "Cannot find php-fpm configuration file for ${DOMAIN}"
         fi
