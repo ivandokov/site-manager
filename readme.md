@@ -33,10 +33,10 @@ site-manager delete [domain.tld] [max-fpm-workers]
 
 Enables nginx virtual host and php-fpm workers
 ```bash
-site-manager enable [domain.tld] [max-fpm-workers]
+site-manager enable [domain.tld]
 ```
 
 Disables nginx virtual host and php-fpm workers
 ```bash
-site-manager disable [domain.tld] [max-fpm-workers]
+site-manager disable [domain.tld]
 ```
