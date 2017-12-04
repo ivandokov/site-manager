@@ -28,7 +28,7 @@ site-manager create [domain.tld] [max-fpm-workers]
 
 Deletes nginx and php-fpm configurations and optionally deletes the system user and website files
 ```bash
-site-manager delete [domain.tld] [max-fpm-workers]
+site-manager delete [domain.tld]
 ```
 
 Enables nginx virtual host and php-fpm workers
