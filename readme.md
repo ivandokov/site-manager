@@ -4,8 +4,8 @@ Setup easy and fast nginx and php for a website
 ## Installation
 The installer is going to setup latest stable versions of nginx and php
 ```bash
-git clone https://github.com/ivandokov/site.git
-cd site
+git clone https://github.com/ivandokov/site-manager.git
+cd site-manager
 ./install-server
 ```
 
@@ -14,7 +14,7 @@ If you want to install xdebug you can run:
 ./install-xdebug
 ```
 
-To make the `site` file globally accessible run:
+To make the `site-manager` globally accessible run:
 ```bash
 sudo ln -s $(pwd)/site-manager /usr/local/bin/site-manager
 ```
