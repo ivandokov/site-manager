@@ -1,4 +1,4 @@
-# Site
+# Site Manager
 Setup easy and fast nginx and php for a website
 
 ## Installation
@@ -16,27 +16,27 @@ If you want to install xdebug you can run:
 
 To make the `site` file globally accessible run:
 ```bash
-sudo ln -s $(pwd)/site /usr/local/bin/site
+sudo ln -s $(pwd)/site-manager /usr/local/bin/site-manager
 ```
 
 ## Usage
 
 Creates system user, website root, logs and webroot directories, nginx and php-fpm configurations
 ```bash
-site create [domain.tld] [max-fpm-workers]
+site-manager create [domain.tld] [max-fpm-workers]
 ```
 
 Deletes nginx and php-fpm configurations and optionally deletes the system user and website files
 ```bash
-site delete [domain.tld] [max-fpm-workers]
+site-manager delete [domain.tld] [max-fpm-workers]
 ```
 
 Enables nginx virtual host and php-fpm workers
 ```bash
-site enable [domain.tld] [max-fpm-workers]
+site-manager enable [domain.tld] [max-fpm-workers]
 ```
 
 Disables nginx virtual host and php-fpm workers
 ```bash
-site disable [domain.tld] [max-fpm-workers]
+site-manager disable [domain.tld] [max-fpm-workers]
 ```
