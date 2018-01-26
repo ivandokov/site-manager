@@ -147,16 +147,16 @@ server {
 	location = /robots.txt  { access_log /dev/null; log_not_found off; }
 
 	location ~* \.(?:jpg|jpeg|gif|png|ico|cur|gz|svg|svgz|mp4|ogg|ogv|webm|htc)$ {
-        access_log off;
-        log_not_found off;
-        #expires 7d;
-        #add_header Cache-Control "public";
-    }
+		access_log off;
+		log_not_found off;
+		#expires 7d;
+		#add_header Cache-Control "public";
+	}
 
-    location ~* \.(?:js|css)$ {
-        access_log off;
-        log_not_found off;
-    }
+	location ~* \.(?:js|css)$ {
+		access_log off;
+		log_not_found off;
+	}
 
 	location ~ \.php$ {
 		fastcgi_pass unix:${FPM_SOCKET};
