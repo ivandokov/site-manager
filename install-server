@@ -31,9 +31,9 @@ php7.2-intl php7.2-readline php7.2-json php7.2-opcache
 msg "Setting up nginx"
 sudo rm /etc/nginx/sites-enabled/default
 sudo rm /etc/nginx/sites-available/default
-echo 'fastcgi_param HTTP_PROXY "";' | sudo tee -a /etc/nginx/fastcgi.conf
-echo 'fastcgi_param HTTP_PROXY "";' | sudo tee -a /etc/nginx/fastcgi_params
-echo 'proxy_set_header Proxy "";' | sudo tee -a /etc/nginx/proxy_params
+echo 'fastcgi_param HTTP_PROXY "";' | sudo tee -a /etc/nginx/fastcgi.conf 1> /dev/null
+echo 'fastcgi_param HTTP_PROXY "";' | sudo tee -a /etc/nginx/fastcgi_params 1> /dev/null
+echo 'proxy_set_header Proxy "";' | sudo tee -a /etc/nginx/proxy_params 1> /dev/null
 
 # Setup php
 msg "Setting up php"
