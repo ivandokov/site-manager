@@ -59,5 +59,5 @@ FPM_MIN_WORKERS=1
 FPM_DISPLAY_ERRORS=on
 
 # Logs location
-SITES_LOGS_DIR=/var/log/www
+LOGS_DIR=/var/log/www
 ``` 

@@ -7,7 +7,7 @@ PUBLIC_DIR=public
 FPM_MAX_WORKERS=5
 FPM_MIN_WORKERS=1
 FPM_DISPLAY_ERRORS=on
-SITES_LOGS_DIR=/var/log/www
+LOGS_DIR=/var/log/www
 
 if [ -f ~/.site_manager ]; then
     . ~/.site_manager
@@ -110,13 +110,13 @@ case $1 in
             sudo chown -R ${DOMAIN}:${DOMAIN} ${SITEROOT}
         fi
 
-        if [ ! -d ${SITES_LOGS_DIR}/${DOMAIN} ]; then
-            echo "Creating website logs directory at ${SITES_LOGS_DIR}/${DOMAIN}"
-            sudo mkdir -p ${SITES_LOGS_DIR}/${DOMAIN}
-            sudo touch ${SITES_LOGS_DIR}/${DOMAIN}/nginx.log
-            sudo touch ${SITES_LOGS_DIR}/${DOMAIN}/php.log
-            sudo chown www-data:www-data ${SITES_LOGS_DIR}/${DOMAIN}/nginx.log
-            sudo chown ${DOMAIN}:${DOMAIN} ${SITES_LOGS_DIR}/${DOMAIN}/php.log
+        if [ ! -d ${LOGS_DIR}/${DOMAIN} ]; then
+            echo "Creating website logs directory at ${LOGS_DIR}/${DOMAIN}"
+            sudo mkdir -p ${LOGS_DIR}/${DOMAIN}
+            sudo touch ${LOGS_DIR}/${DOMAIN}/nginx.log
+            sudo touch ${LOGS_DIR}/${DOMAIN}/php.log
+            sudo chown www-data:www-data ${LOGS_DIR}/${DOMAIN}/nginx.log
+            sudo chown ${DOMAIN}:${DOMAIN} ${LOGS_DIR}/${DOMAIN}/php.log
         fi
 
         if [ -f /etc/nginx/sites-available/${DOMAIN}.conf ]; then
@@ -136,7 +136,7 @@ server {
 	charset utf-8;
 
 	access_log /dev/null;
-	error_log ${SITES_LOGS_DIR}/${DOMAIN}/nginx.log error;
+	error_log ${LOGS_DIR}/${DOMAIN}/nginx.log error;
 	error_page 404 /index.php;
 
 	location / {
@@ -187,7 +187,7 @@ pm.max_spare_servers = 3
 pm.max_requests = 500
 catch_workers_output = yes
 php_flag[display_errors] = ${DISPLAY_ERRORS}
-php_admin_value[error_log] = ${SITES_LOGS_DIR}/${DOMAIN}/php.log
+php_admin_value[error_log] = ${LOGS_DIR}/${DOMAIN}/php.log
 php_admin_flag[log_errors] = on
 ;php_admin_value[memory_limit] = 512M
 EOF
@@ -214,7 +214,7 @@ EOF
         sudo rm /etc/nginx/sites-available/${DOMAIN}.conf
         sudo rm /etc/nginx/sites-enabled/${DOMAIN}.conf
         sudo rm /etc/php/7.2/fpm/pool.d/${DOMAIN}.conf
-        sudo rm -r ${SITES_LOGS_DIR}/${DOMAIN}
+        sudo rm -r ${LOGS_DIR}/${DOMAIN}
         echo "Deleted configurations for ${DOMAIN}"
         sudo service nginx reload
         sudo service php7.2-fpm reload
