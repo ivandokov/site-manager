@@ -2,6 +2,19 @@
 
 set -e
 
+SITES_DIR=/var/www
+PUBLIC_DIR=public
+FPM_MAX_WORKERS=5
+FPM_MIN_WORKERS=1
+FPM_DISPLAY_ERRORS=on
+SITES_LOGS_DIR=/var/log/www
+
+if [ -f ~/.site_manager ]; then
+    . ~/.site_manager
+elif [ -f /etc/site_manager ]; then
+    . /etc/site_manager
+fi
+
 function askForDomain {
     DOMAIN="$1"
     while true; do
@@ -21,13 +34,30 @@ function askForDomain {
     fi
 }
 
+function askForMinFpmWorkers {
+    MIN_WORKERS="$1"
+    while true; do
+        if [ -z "${MIN_WORKERS}" ]; then
+            read -p "Minimum php-fpm workers [${FPM_MIN_WORKERS}]: " MIN_WORKERS
+            if [ -z "${MIN_WORKERS}" ]; then
+                MIN_WORKERS=${FPM_MIN_WORKERS}
+            fi
+        elif [ "${MIN_WORKERS}" -lt 1 ]; then
+            echo "Maximum php-fpm workers cannot be lower than 1"
+            MIN_WORKERS=
+        else
+            break
+        fi
+    done
+}
+
 function askForMaxFpmWorkers {
     MAX_WORKERS="$1"
     while true; do
         if [ -z "${MAX_WORKERS}" ]; then
-            read -p "Maximum php-fpm workers [5]: " MAX_WORKERS
+            read -p "Maximum php-fpm workers [${FPM_MAX_WORKERS}]: " MAX_WORKERS
             if [ -z "${MAX_WORKERS}" ]; then
-                MAX_WORKERS=5
+                MAX_WORKERS=${FPM_MAX_WORKERS}
             fi
         elif [ "${MAX_WORKERS}" -lt 3 ]; then
             echo "Maximum php-fpm workers cannot be lower than 3"
@@ -38,13 +68,29 @@ function askForMaxFpmWorkers {
     done
 }
 
+function askForDisplayErrors {
+    DISPLAY_ERRORS="$1"
+    while true; do
+        if [ "${DISPLAY_ERRORS}" != "on" ] && [ "${DISPLAY_ERRORS}" != "off" ]; then
+            read -p "Display php errors in browser [on/off]: " DISPLAY_ERRORS
+            if [ -z "${DISPLAY_ERRORS}" ]; then
+                DISPLAY_ERRORS=${FPM_DISPLAY_ERRORS}
+            fi
+        else
+            break
+        fi
+    done
+}
+
 case $1 in
     create)
         askForDomain $2
-        askForMaxFpmWorkers $3
+        askForMinFpmWorkers $3
+        askForMaxFpmWorkers $4
+        askForDisplayErrors $5
 
-        SITEROOT=/var/www/${DOMAIN}
-        WEBROOT=/var/www/${DOMAIN}/www/public
+        SITEROOT=${SITES_DIR}/${DOMAIN}
+        WEBROOT=${SITEROOT}/${PUBLIC_DIR}
         FPM_SOCKET=/var/run/php/${DOMAIN}.sock
         PHP_POOL=/etc/php/7.2/fpm/pool.d/${DOMAIN}.conf
 
@@ -57,12 +103,20 @@ case $1 in
             echo "Site root directory already exists"
         else
             echo "Creating website root directory at ${SITEROOT}"
-            sudo mkdir -p ${SITEROOT}/logs
-            sudo mkdir -p ${SITEROOT}/www/public
-            echo "Hello, World!" | sudo tee ${SITEROOT}/www/public/index.php > /dev/null
+            sudo mkdir -p ${WEBROOT}
+            echo "Hello World!" | sudo tee ${WEBROOT}/index.php > /dev/null
 
             echo "Changing ownership of all site files to ${DOMAIN}:${DOMAIN}"
             sudo chown -R ${DOMAIN}:${DOMAIN} ${SITEROOT}
+        fi
+
+        if [ ! -d ${SITES_LOGS_DIR}/${DOMAIN} ]; then
+            echo "Creating website logs directory at ${SITES_LOGS_DIR}/${DOMAIN}"
+            sudo mkdir -p ${SITES_LOGS_DIR}/${DOMAIN}
+            sudo touch ${SITES_LOGS_DIR}/${DOMAIN}/nginx.log
+            sudo touch ${SITES_LOGS_DIR}/${DOMAIN}/php.log
+            sudo chown www-data:www-data ${SITES_LOGS_DIR}/${DOMAIN}/nginx.log
+            sudo chown ${DOMAIN}:${DOMAIN} ${SITES_LOGS_DIR}/${DOMAIN}/php.log
         fi
 
         if [ -f /etc/nginx/sites-available/${DOMAIN}.conf ]; then
@@ -81,9 +135,8 @@ server {
 	index index.html index.php;
 	charset utf-8;
 
-	#access_log ${SITEROOT}/logs/nginx-access.log combined;
 	access_log /dev/null;
-	error_log  ${SITEROOT}/logs/nginx-error.log error;
+	error_log ${SITES_LOGS_DIR}/${DOMAIN}/nginx.log error;
 	error_page 404 /index.php;
 
 	location / {
@@ -92,6 +145,18 @@ server {
 
 	location = /favicon.ico { access_log /dev/null; log_not_found off; }
 	location = /robots.txt  { access_log /dev/null; log_not_found off; }
+
+	location ~* \.(?:jpg|jpeg|gif|png|ico|cur|gz|svg|svgz|mp4|ogg|ogv|webm|htc)$ {
+        access_log off;
+        log_not_found off;
+        #expires 7d;
+        #add_header Cache-Control "public";
+    }
+
+    location ~* \.(?:js|css)$ {
+        access_log off;
+        log_not_found off;
+    }
 
 	location ~ \.php$ {
 		fastcgi_pass unix:${FPM_SOCKET};
@@ -116,12 +181,13 @@ listen.owner = www-data
 listen.group = www-data
 pm = dynamic
 pm.max_children = ${MAX_WORKERS}
-pm.start_servers = 2
+pm.start_servers = ${MIN_WORKERS}
 pm.min_spare_servers = 1
 pm.max_spare_servers = 3
 pm.max_requests = 500
-;php_flag[display_errors] = off
-php_admin_value[error_log] = ${SITEROOT}/logs/php-error.log
+catch_workers_output = yes
+php_flag[display_errors] = ${DISPLAY_ERRORS}
+php_admin_value[error_log] = ${SITES_LOGS_DIR}/${DOMAIN}/php.log
 php_admin_flag[log_errors] = on
 ;php_admin_value[memory_limit] = 512M
 EOF
@@ -148,6 +214,7 @@ EOF
         sudo rm /etc/nginx/sites-available/${DOMAIN}.conf
         sudo rm /etc/nginx/sites-enabled/${DOMAIN}.conf
         sudo rm /etc/php/7.2/fpm/pool.d/${DOMAIN}.conf
+        sudo rm -r ${SITES_LOGS_DIR}/${DOMAIN}
         echo "Deleted configurations for ${DOMAIN}"
         sudo service nginx reload
         sudo service php7.2-fpm reload
