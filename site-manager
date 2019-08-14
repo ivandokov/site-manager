@@ -92,7 +92,7 @@ case $1 in
         SITEROOT=${SITES_DIR}/${DOMAIN}
         WEBROOT=${SITEROOT}/${PUBLIC_DIR}
         FPM_SOCKET=/var/run/php/${DOMAIN}.sock
-        PHP_POOL=/etc/php/7.2/fpm/pool.d/${DOMAIN}.conf
+        PHP_POOL=/etc/php/7.3/fpm/pool.d/${DOMAIN}.conf
 
         if ! getent passwd ${DOMAIN} > /dev/null; then
             echo "Creating system user ${DOMAIN}"
@@ -122,48 +122,48 @@ case $1 in
         if [ -f /etc/nginx/sites-available/${DOMAIN}.conf ]; then
             echo "Configuration file for nginx already exists"
         else
-	        echo "Creating nginx configuration file"
+            echo "Creating nginx configuration file"
             sudo tee /etc/nginx/sites-available/${DOMAIN}.conf &>/dev/null <<EOF
 server {
-	server_name  www.${DOMAIN};
-	rewrite ^(.*) http://${DOMAIN}\$1 permanent;
+    server_name  www.${DOMAIN};
+    rewrite ^(.*) http://${DOMAIN}\$1 permanent;
 }
 server {
-	listen 80;
-	server_name ${DOMAIN};
-	root ${WEBROOT};
-	index index.html index.php;
-	charset utf-8;
+    listen 80;
+    server_name ${DOMAIN};
+    root ${WEBROOT};
+    index index.html index.php;
+    charset utf-8;
 
-	access_log /dev/null;
-	error_log ${LOGS_DIR}/${DOMAIN}/nginx.log error;
-	error_page 404 /index.php;
+    access_log /dev/null;
+    error_log ${LOGS_DIR}/${DOMAIN}/nginx.log error;
+    error_page 404 /index.php;
 
-	location / {
-		try_files \$uri \$uri/ /index.php?\$query_string;
-	}
+    location / {
+        try_files \$uri \$uri/ /index.php?\$query_string;
+    }
 
-	location = /favicon.ico { access_log /dev/null; log_not_found off; }
-	location = /robots.txt  { access_log /dev/null; log_not_found off; }
+    location = /favicon.ico { access_log /dev/null; log_not_found off; }
+    location = /robots.txt  { access_log /dev/null; log_not_found off; }
 
-	location ~* \.(?:jpg|jpeg|gif|png|ico|cur|gz|svg|svgz|mp4|ogg|ogv|webm|htc)$ {
-		access_log off;
-		log_not_found off;
-		#expires 7d;
-		#add_header Cache-Control "public";
-	}
+    location ~* \.(?:jpg|jpeg|gif|png|ico|cur|gz|svg|svgz|mp4|ogg|ogv|webm|htc)$ {
+        access_log off;
+        log_not_found off;
+        #expires 7d;
+        #add_header Cache-Control "public";
+    }
 
-	location ~* \.(?:js|css)$ {
-		access_log off;
-		log_not_found off;
-	}
+    location ~* \.(?:js|css)$ {
+        access_log off;
+        log_not_found off;
+    }
 
-	location ~ \.php$ {
-		fastcgi_pass unix:${FPM_SOCKET};
-		fastcgi_index index.php;
-		fastcgi_param SCRIPT_FILENAME \$realpath_root\$fastcgi_script_name;
-		include fastcgi_params;
-	}
+    location ~ \.php$ {
+        fastcgi_pass unix:${FPM_SOCKET};
+        fastcgi_index index.php;
+        fastcgi_param SCRIPT_FILENAME \$realpath_root\$fastcgi_script_name;
+        include fastcgi_params;
+    }
 }
 EOF
         fi
@@ -171,7 +171,7 @@ EOF
         if [ -f ${PHP_POOL} ]; then
             echo "Configuration file for php-fpm already exists"
         else
-	        echo "Creating php-fpm configuration file"
+            echo "Creating php-fpm configuration file"
             sudo tee "${PHP_POOL}" &>/dev/null <<EOF
 [${DOMAIN}]
 user = ${DOMAIN}
@@ -191,7 +191,7 @@ php_admin_value[error_log] = ${LOGS_DIR}/${DOMAIN}/php.log
 php_admin_flag[log_errors] = on
 ;php_admin_value[memory_limit] = 512M
 EOF
-	    fi
+        fi
 
         if [ ! -L /etc/nginx/sites-enabled/${DOMAIN}.conf ]; then
             echo "Enabled domain ${DOMAIN}"
@@ -200,7 +200,7 @@ EOF
 
         echo "Restarting services"
         sudo service nginx reload > /dev/null
-	    sudo service php7.2-fpm restart > /dev/null
+        sudo service php7.3-fpm restart > /dev/null
         ;;
     delete)
         askForDomain $2
@@ -213,11 +213,11 @@ EOF
 
         sudo rm /etc/nginx/sites-available/${DOMAIN}.conf
         sudo rm /etc/nginx/sites-enabled/${DOMAIN}.conf
-        sudo rm /etc/php/7.2/fpm/pool.d/${DOMAIN}.conf
+        sudo rm /etc/php/7.3/fpm/pool.d/${DOMAIN}.conf
         sudo rm -r ${LOGS_DIR}/${DOMAIN}
         echo "Deleted configurations for ${DOMAIN}"
         sudo service nginx reload
-        sudo service php7.2-fpm reload
+        sudo service php7.3-fpm reload
 
         read -p "Do you want to DELETE site files? [y/n]: " yn
         if [ "${yn}" == "y" ]; then
@@ -235,9 +235,9 @@ EOF
             echo "Cannot find nginx configuration file for ${DOMAIN}"
         fi
 
-        if [ -f /etc/php/7.2/fpm/pool.d/${DOMAIN}.conf.disabled ]; then
-            sudo mv /etc/php/7.2/fpm/pool.d/${DOMAIN}.conf.disabled /etc/php/7.2/fpm/pool.d/${DOMAIN}.conf
-            sudo service php7.2-fpm reload
+        if [ -f /etc/php/7.3/fpm/pool.d/${DOMAIN}.conf.disabled ]; then
+            sudo mv /etc/php/7.3/fpm/pool.d/${DOMAIN}.conf.disabled /etc/php/7.3/fpm/pool.d/${DOMAIN}.conf
+            sudo service php7.3-fpm reload
         else
             echo "Cannot find php-fpm configuration file for ${DOMAIN}"
         fi
@@ -251,9 +251,9 @@ EOF
             echo "Cannot find nginx configuration file for ${DOMAIN}"
         fi
 
-        if [ -f /etc/php/7.2/fpm/pool.d/${DOMAIN}.conf ]; then
-            sudo mv /etc/php/7.2/fpm/pool.d/${DOMAIN}.conf /etc/php/7.2/fpm/pool.d/${DOMAIN}.conf.disabled
-            sudo service php7.2-fpm reload
+        if [ -f /etc/php/7.3/fpm/pool.d/${DOMAIN}.conf ]; then
+            sudo mv /etc/php/7.3/fpm/pool.d/${DOMAIN}.conf /etc/php/7.3/fpm/pool.d/${DOMAIN}.conf.disabled
+            sudo service php7.3-fpm reload
         else
             echo "Cannot find php-fpm configuration file for ${DOMAIN}"
         fi
