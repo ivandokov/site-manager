@@ -10,15 +10,15 @@ function msg {
 
 # Install xdebug
 msg "Installing xdebug"
-sudo apt-get install -y php7.2-xdebug
+sudo apt-get install -y php7.3-xdebug
 
 # Setup xdebug
 msg "Setting up xdebug"
-echo "xdebug.remote_enable = 1" | sudo tee -a /etc/php/7.2/mods-available/xdebug.ini
-echo "xdebug.remote_connect_back = 1" | sudo tee -a /etc/php/7.2/mods-available/xdebug.ini
-echo "xdebug.remote_port = 9000" | sudo tee -a /etc/php/7.2/mods-available/xdebug.ini
-echo "xdebug.max_nesting_level = 512" | sudo tee -a /etc/php/7.2/mods-available/xdebug.ini
-echo "opcache.revalidate_freq = 0" | sudo tee -a /etc/php/7.2/mods-available/opcache.ini
+echo "xdebug.remote_enable = 1" | sudo tee -a /etc/php/7.3/mods-available/xdebug.ini
+echo "xdebug.remote_connect_back = 1" | sudo tee -a /etc/php/7.3/mods-available/xdebug.ini
+echo "xdebug.remote_port = 9000" | sudo tee -a /etc/php/7.3/mods-available/xdebug.ini
+echo "xdebug.max_nesting_level = 512" | sudo tee -a /etc/php/7.3/mods-available/xdebug.ini
+echo "opcache.revalidate_freq = 0" | sudo tee -a /etc/php/7.3/mods-available/opcache.ini
 
 msg "Turning on display errors"
 sudo sed -i "s/display_errors = .*/display_errors = On/" /etc/php/7.2/cli/php.ini
@@ -28,4 +28,4 @@ sudo sed -i "s/display_errors = .*/display_errors = On/" /etc/php/7.2/cli/php.in
 
 # Restart php
 msg "Restarting php-fpm"
-sudo service php7.2-fpm restart
+sudo service php7.3-fpm restart
