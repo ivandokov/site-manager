@@ -313,12 +313,12 @@ EOF
 
         while true; do
             read -p "New php version: " NEW_PHP_VERSION
-            if [ -d /etc/php/${NEW_PHP_VERSION}/fpm ]; then
-                break
-            elif [ "${NEW_PHP_VERSION}" -eq "${OLD_PHP_VERSION}" ]; then
+            if [ "${NEW_PHP_VERSION}" -eq "${OLD_PHP_VERSION}" ]; then
                 echo "The new version cannot be the same as the old version"
-            else
+            elif [ ! -d /etc/php/${NEW_PHP_VERSION}/fpm ]; then
                 echo "This php version is not installed"
+            else
+                break
             fi
         done
 
