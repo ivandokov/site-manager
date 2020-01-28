@@ -24,12 +24,9 @@ msg "Installing nginx"
 sudo apt-get install -y nginx
 
 msg "Installing php"
-sudo apt-get install -y php7.3-fpm php7.3-cli \
-php7.3-mysql php7.3-pgsql php7.3-sqlite3 \
-php7.3-curl php7.3-memcached php7.3-redis \
-php7.3-imap php7.3-mbstring php7.3-gd \
-php7.3-xml php7.3-zip php7.3-soap \
-php7.3-intl php7.3-readline php7.3-json php7.3-opcache
+sudo apt-get install -y php7.4-fpm php7.4-cli php7.4-mysql php7.4-pgsql php7.4-sqlite3 \
+php7.4-curl php7.4-memcached php7.4-redis php7.4-imap php7.4-mbstring php7.4-gd \
+php7.4-xml php7.4-zip php7.4-soap php7.4-intl php7.4-readline php7.4-json php7.4-opcache
 
 # Setup nginx
 msg "Setting up nginx"
@@ -41,14 +38,14 @@ echo 'proxy_set_header Proxy "";' | sudo tee -a /etc/nginx/proxy_params 1> /dev/
 
 # Setup php
 msg "Setting up php"
-sudo sed -i "s/log_errors = .*/log_errors = On/" /etc/php/7.3/cli/php.ini
-sudo sed -i "s/error_reporting = .*/error_reporting = E_ALL/" /etc/php/7.3/cli/php.ini
-sudo sed -i "s/display_errors = .*/display_errors = Off/" /etc/php/7.3/cli/php.ini
-sudo sed -i "s/memory_limit = .*/memory_limit = 512M/" /etc/php/7.3/cli/php.ini
-sudo sed -i "s/;date.timezone.*/date.timezone = UTC/" /etc/php/7.3/cli/php.ini
-sudo sed -i "s/upload_max_filesize = .*/upload_max_filesize = 100M/" /etc/php/7.3/fpm/php.ini
-sudo sed -i "s/post_max_size = .*/post_max_size = 100M/" /etc/php/7.3/fpm/php.ini
-sudo sed -i "s/;cgi.fix_pathinfo=1/cgi.fix_pathinfo=0/" /etc/php/7.3/fpm/php.ini
+sudo sed -i "s/log_errors = .*/log_errors = On/" /etc/php/7.4/cli/php.ini
+sudo sed -i "s/error_reporting = .*/error_reporting = E_ALL/" /etc/php/7.4/cli/php.ini
+sudo sed -i "s/display_errors = .*/display_errors = Off/" /etc/php/7.4/cli/php.ini
+sudo sed -i "s/memory_limit = .*/memory_limit = 512M/" /etc/php/7.4/cli/php.ini
+sudo sed -i "s/;date.timezone.*/date.timezone = UTC/" /etc/php/7.4/cli/php.ini
+sudo sed -i "s/upload_max_filesize = .*/upload_max_filesize = 100M/" /etc/php/7.4/fpm/php.ini
+sudo sed -i "s/post_max_size = .*/post_max_size = 100M/" /etc/php/7.4/fpm/php.ini
+sudo sed -i "s/;cgi.fix_pathinfo=1/cgi.fix_pathinfo=0/" /etc/php/7.4/fpm/php.ini
 sudo mkdir /var/log/sites
 sudo chown www-data:www-data /var/log/sites
 
@@ -60,4 +57,4 @@ sudo mv composer.phar /usr/local/bin/composer
 # Restart services
 msg "Restarting nginx and php-fpm"
 sudo service nginx restart
-sudo service php7.3-fpm restart
+sudo service php7.4-fpm restart
