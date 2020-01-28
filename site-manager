@@ -85,6 +85,10 @@ function askForDisplayErrors {
 }
 
 function getSitePhpVersion {
+    if [ -z "${SITEROOT}" ]; then
+        SITEROOT=${SITES_DIR}/${DOMAIN}
+    fi
+
     SITE_PHP_VERSION=${PHP_VERSION}
     if [ -f ${SITEROOT}/.php-version ]; then
         SITE_PHP_VERSION=`cat ${SITEROOT}/.php-version`
