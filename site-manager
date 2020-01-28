@@ -257,17 +257,19 @@ EOF
         getSitePhpVersion
 
         if [ -f /etc/nginx/sites-available/${DOMAIN}.conf ]; then
-            sudo rm /etc/nginx/sites-enabled/${DOMAIN}.conf
+            if [ -f /etc/nginx/sites-enabled/${DOMAIN}.conf ]; then
+                sudo rm /etc/nginx/sites-enabled/${DOMAIN}.conf
+            fi
             sudo service nginx reload
         else
-            echo "Cannot find nginx configuration file for ${DOMAIN}. Maybe it is already disabled?"
+            echo "Cannot find nginx configuration file for ${DOMAIN}"
         fi
 
         if [ -f /etc/php/${SITE_PHP_VERSION}/fpm/pool.d/${DOMAIN}.conf ]; then
             sudo mv /etc/php/${SITE_PHP_VERSION}/fpm/pool.d/${DOMAIN}.conf /etc/php/${SITE_PHP_VERSION}/fpm/pool.d/${DOMAIN}.conf.disabled
             sudo service php${SITE_PHP_VERSION}-fpm reload
         else
-            echo "Cannot find php${SITE_PHP_VERSION}-fpm configuration file for ${DOMAIN}. Maybe it is already disabled?"
+            echo "Cannot find php${SITE_PHP_VERSION}-fpm configuration file for ${DOMAIN}"
         fi
         ;;
     *)
