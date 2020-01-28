@@ -242,18 +242,26 @@ EOF
         askForDomain $2
         getSitePhpVersion
 
-        if [ -f /etc/nginx/sites-available/${DOMAIN}.conf ]; then
-            sudo ln -s /etc/nginx/sites-available/${DOMAIN}.conf /etc/nginx/sites-enabled/
-            sudo service nginx reload
+        if [ -f /etc/nginx/sites-enabled/${DOMAIN}.conf ]; then
+            echo "${DOMAIN} is already enabled in nginx configuration"
         else
-            echo "Cannot find nginx configuration file for ${DOMAIN}"
+            if [ -f /etc/nginx/sites-available/${DOMAIN}.conf ]; then
+                sudo ln -s /etc/nginx/sites-available/${DOMAIN}.conf /etc/nginx/sites-enabled/
+                sudo service nginx reload
+            else
+                echo "Cannot find nginx configuration file for ${DOMAIN}"
+            fi
         fi
 
-        if [ -f /etc/php/${SITE_PHP_VERSION}/fpm/pool.d/${DOMAIN}.conf.disabled ]; then
-            sudo mv /etc/php/${SITE_PHP_VERSION}/fpm/pool.d/${DOMAIN}.conf.disabled /etc/php/${SITE_PHP_VERSION}/fpm/pool.d/${DOMAIN}.conf
-            sudo service php${SITE_PHP_VERSION}-fpm reload
+        if [ -f /etc/php/${SITE_PHP_VERSION}/fpm/pool.d/${DOMAIN}.conf ]; then
+            echo "${DOMAIN} is already enabled in php${SITE_PHP_VERSION}-fpm configuration"
         else
-            echo "Cannot find php${SITE_PHP_VERSION}-fpm configuration file for ${DOMAIN}"
+            if [ -f /etc/php/${SITE_PHP_VERSION}/fpm/pool.d/${DOMAIN}.conf.disabled ]; then
+                sudo mv /etc/php/${SITE_PHP_VERSION}/fpm/pool.d/${DOMAIN}.conf.disabled /etc/php/${SITE_PHP_VERSION}/fpm/pool.d/${DOMAIN}.conf
+                sudo service php${SITE_PHP_VERSION}-fpm reload
+            else
+                echo "Cannot find php${SITE_PHP_VERSION}-fpm configuration file for ${DOMAIN}"
+            fi
         fi
         ;;
     disable)
@@ -263,6 +271,9 @@ EOF
         if [ -f /etc/nginx/sites-available/${DOMAIN}.conf ]; then
             if [ -f /etc/nginx/sites-enabled/${DOMAIN}.conf ]; then
                 sudo rm /etc/nginx/sites-enabled/${DOMAIN}.conf
+                echo "Disabling nginx configuration for ${DOMAIN}"
+            else
+                echo "${DOMAIN} is already disabled in nginx configuration"
             fi
             sudo service nginx reload
         else
@@ -273,7 +284,11 @@ EOF
             sudo mv /etc/php/${SITE_PHP_VERSION}/fpm/pool.d/${DOMAIN}.conf /etc/php/${SITE_PHP_VERSION}/fpm/pool.d/${DOMAIN}.conf.disabled
             sudo service php${SITE_PHP_VERSION}-fpm reload
         else
-            echo "Cannot find php${SITE_PHP_VERSION}-fpm configuration file for ${DOMAIN}"
+            if [ -f /etc/php/${SITE_PHP_VERSION}/fpm/pool.d/${DOMAIN}.conf.disabled ]; then
+                echo "${DOMAIN} is already disabled in php${SITE_PHP_VERSION}-fpm configuration"
+            else
+                echo "Cannot find php${SITE_PHP_VERSION}-fpm configuration file for ${DOMAIN}"
+            fi
         fi
         ;;
     *)
