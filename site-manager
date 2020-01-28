@@ -122,6 +122,8 @@ case $1 in
         if [ -f /etc/nginx/sites-available/${DOMAIN}.conf ]; then
             echo "Configuration file for nginx already exists"
         else
+            read -p "Website root directory: " -i "${WEBROOT}" -e WEBROOT
+
             echo "Creating nginx configuration file"
             sudo tee /etc/nginx/sites-available/${DOMAIN}.conf &>/dev/null <<EOF
 server {
@@ -163,6 +165,7 @@ server {
         fastcgi_index index.php;
         fastcgi_param SCRIPT_FILENAME \$realpath_root\$fastcgi_script_name;
         include fastcgi_params;
+        #add_header X-Robots-Tag "noindex, nofollow, nosnippet, noarchive, noimageindex";
     }
 }
 EOF
@@ -214,7 +217,7 @@ EOF
         sudo rm /etc/nginx/sites-available/${DOMAIN}.conf
         sudo rm /etc/nginx/sites-enabled/${DOMAIN}.conf
         sudo rm /etc/php/7.4/fpm/pool.d/${DOMAIN}.conf
-        sudo rm -r ${LOGS_DIR}/${DOMAIN}
+        sudo rm -rf ${LOGS_DIR}/${DOMAIN}
         echo "Deleted configurations for ${DOMAIN}"
         sudo service nginx reload
         sudo service php7.4-fpm reload
