@@ -321,6 +321,7 @@ EOF
         done
 
         mv /etc/php/${OLD_PHP_VERSION}/fpm/pool.d/${DOMAIN}.conf /etc/php/${NEW_PHP_VERSION}/fpm/pool.d/${DOMAIN}.conf
+        echo "${NEW_PHP_VERSION}" | sudo tee ${SITEROOT}/.php-version > /dev/null
         sudo service php${OLD_PHP_VERSION}-fpm reload
         sudo service php${NEW_PHP_VERSION}-fpm reload
         ;;
