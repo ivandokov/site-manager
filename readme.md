@@ -31,6 +31,11 @@ Disables nginx virtual host and php-fpm workers
 site-manager disable [domain.tld]
 ```
 
+Change the php version of the website
+```bash
+site-manager php [domain.tld]
+```
+
 ## Configuration
 
 If you want to change the default behavior you can create a configuration file at `/etc/site_manager` or `~/.site_manager`. The configuration from your home directory takes priority.

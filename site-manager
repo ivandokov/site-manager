@@ -294,7 +294,37 @@ EOF
             fi
         fi
         ;;
+    php)
+        askForDomain $2
+        getSitePhpVersion
+
+        if [ ! -f ${SITEROOT}/.php-version ]; then
+            while true; do
+                read -p "What is the current php version of this website: " OLD_PHP_VERSION
+                if [ -f /etc/php/${OLD_PHP_VERSION}/fpm/pool.d/${DOMAIN}.conf ]; then
+                    break
+                else
+                    echo "Cannot find php${OLD_PHP_VERSION}-fpm configuration for domain ${DOMAIN}"
+                fi
+            done
+        else
+            OLD_PHP_VERSION=${SITE_PHP_VERSION}
+        fi
+
+        while true; do
+            read -p "New php version: " NEW_PHP_VERSION
+            if [ -d /etc/php/${NEW_PHP_VERSION}/fpm ]; then
+                break
+            else
+                echo "This php version is not installed"
+            fi
+        done
+
+        mv /etc/php/${OLD_PHP_VERSION}/fpm/pool.d/${DOMAIN}.conf /etc/php/${NEW_PHP_VERSION}/fpm/pool.d/${DOMAIN}.conf
+        sudo service php${OLD_PHP_VERSION}-fpm reload
+        sudo service php${NEW_PHP_VERSION}-fpm reload
+        ;;
     *)
-        echo "Usage: create|delete|enable|disable domain.tld"
+        echo "Usage: create|delete|enable|disable|php domain.tld"
         ;;
 esac
