@@ -9,11 +9,6 @@ cd site-manager
 ./install
 ```
 
-If you want to install xdebug you can run:
-```bash
-./install-xdebug
-```
-
 ## Usage
 
 Creates system user, website root, logs and webroot directories, nginx and php-fpm configurations
