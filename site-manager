@@ -211,7 +211,7 @@ EOF
         fi
 
         echo "Restarting services"
-        sudo service nginx reload > /dev/null
+        sudo service nginx restart > /dev/null
         sudo service php${PHP_VERSION}-fpm restart > /dev/null
         ;;
     delete)
@@ -229,8 +229,8 @@ EOF
         sudo rm /etc/php/${SITE_PHP_VERSION}/fpm/pool.d/${DOMAIN}.conf
         sudo rm -rf ${LOGS_DIR}/${DOMAIN}
         echo "Deleted configurations for ${DOMAIN}"
-        sudo service nginx reload
-        sudo service php${SITE_PHP_VERSION}-fpm reload
+        sudo service nginx restart
+        sudo service php${SITE_PHP_VERSION}-fpm restart
 
         read -p "Do you want to DELETE site files? [y/n]: " yn
         if [ "${yn}" == "y" ]; then
@@ -248,7 +248,7 @@ EOF
             if [ -f /etc/nginx/sites-available/${DOMAIN}.conf ]; then
                 echo "Enabling nginx configuration for ${DOMAIN}"
                 sudo ln -s /etc/nginx/sites-available/${DOMAIN}.conf /etc/nginx/sites-enabled/
-                sudo service nginx reload
+                sudo service nginx restart
             else
                 echo "Cannot find nginx configuration file for ${DOMAIN}"
             fi
@@ -260,7 +260,7 @@ EOF
             if [ -f /etc/php/${SITE_PHP_VERSION}/fpm/pool.d/${DOMAIN}.conf.disabled ]; then
                 echo "Enabling php${SITE_PHP_VERSION}-fpm configuration for ${DOMAIN}"
                 sudo mv /etc/php/${SITE_PHP_VERSION}/fpm/pool.d/${DOMAIN}.conf.disabled /etc/php/${SITE_PHP_VERSION}/fpm/pool.d/${DOMAIN}.conf
-                sudo service php${SITE_PHP_VERSION}-fpm reload
+                sudo service php${SITE_PHP_VERSION}-fpm restart
             else
                 echo "Cannot find php${SITE_PHP_VERSION}-fpm configuration file for ${DOMAIN}"
             fi
@@ -277,7 +277,7 @@ EOF
             else
                 echo "${DOMAIN} is already disabled in nginx configuration"
             fi
-            sudo service nginx reload
+            sudo service nginx restart
         else
             echo "Cannot find nginx configuration file for ${DOMAIN}"
         fi
@@ -285,7 +285,7 @@ EOF
         if [ -f /etc/php/${SITE_PHP_VERSION}/fpm/pool.d/${DOMAIN}.conf ]; then
             echo "Disabling php${SITE_PHP_VERSION}-fpm configuration for ${DOMAIN}"
             sudo mv /etc/php/${SITE_PHP_VERSION}/fpm/pool.d/${DOMAIN}.conf /etc/php/${SITE_PHP_VERSION}/fpm/pool.d/${DOMAIN}.conf.disabled
-            sudo service php${SITE_PHP_VERSION}-fpm reload
+            sudo service php${SITE_PHP_VERSION}-fpm restart
         else
             if [ -f /etc/php/${SITE_PHP_VERSION}/fpm/pool.d/${DOMAIN}.conf.disabled ]; then
                 echo "${DOMAIN} is already disabled in php${SITE_PHP_VERSION}-fpm configuration"
@@ -322,8 +322,8 @@ EOF
 
         mv /etc/php/${OLD_PHP_VERSION}/fpm/pool.d/${DOMAIN}.conf /etc/php/${NEW_PHP_VERSION}/fpm/pool.d/${DOMAIN}.conf
         echo "${NEW_PHP_VERSION}" | sudo tee ${SITEROOT}/.php-version > /dev/null
-        sudo service php${OLD_PHP_VERSION}-fpm reload
-        sudo service php${NEW_PHP_VERSION}-fpm reload
+        sudo service php${OLD_PHP_VERSION}-fpm restart
+        sudo service php${NEW_PHP_VERSION}-fpm restart
         ;;
     *)
         echo "Usage: create|delete|enable|disable|php domain.tld"
