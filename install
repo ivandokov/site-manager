@@ -2,6 +2,8 @@
 
 set -e
 
+PHP_VERSION=7.4
+
 function msg {
     echo "========================================"
     echo "$1"
@@ -24,7 +26,7 @@ msg "Installing nginx"
 sudo apt-get install -y nginx
 
 msg "Installing php"
-sudo apt-get install -y php7.4-fpm php7.4-cli php7.4-mysql php7.4-pgsql php7.4-curl php7.4-redis php7.4-mbstring php7.4-gd php7.4-xml php7.4-zip php7.4-intl php7.4-readline php7.4-json php7.4-opcache
+sudo apt-get install -y php${PHP_VERSION}-fpm php${PHP_VERSION}-cli php${PHP_VERSION}-mysql php${PHP_VERSION}-pgsql php${PHP_VERSION}-curl php${PHP_VERSION}-redis php${PHP_VERSION}-mbstring php${PHP_VERSION}-gd php${PHP_VERSION}-xml php${PHP_VERSION}-zip php${PHP_VERSION}-intl php${PHP_VERSION}-readline php${PHP_VERSION}-json php${PHP_VERSION}-opcache
 
 # Setup nginx
 msg "Setting up nginx"
@@ -36,14 +38,14 @@ echo 'proxy_set_header Proxy "";' | sudo tee -a /etc/nginx/proxy_params 1> /dev/
 
 # Setup php
 msg "Setting up php"
-sudo sed -i "s/log_errors = .*/log_errors = On/" /etc/php/7.4/cli/php.ini
-sudo sed -i "s/error_reporting = .*/error_reporting = E_ALL/" /etc/php/7.4/cli/php.ini
-sudo sed -i "s/display_errors = .*/display_errors = Off/" /etc/php/7.4/cli/php.ini
-sudo sed -i "s/memory_limit = .*/memory_limit = 512M/" /etc/php/7.4/cli/php.ini
-sudo sed -i "s/;date.timezone.*/date.timezone = UTC/" /etc/php/7.4/cli/php.ini
-sudo sed -i "s/upload_max_filesize = .*/upload_max_filesize = 100M/" /etc/php/7.4/fpm/php.ini
-sudo sed -i "s/post_max_size = .*/post_max_size = 100M/" /etc/php/7.4/fpm/php.ini
-sudo sed -i "s/;cgi.fix_pathinfo=1/cgi.fix_pathinfo=0/" /etc/php/7.4/fpm/php.ini
+sudo sed -i "s/log_errors = .*/log_errors = On/" /etc/php/${PHP_VERSION}/cli/php.ini
+sudo sed -i "s/error_reporting = .*/error_reporting = E_ALL/" /etc/php/${PHP_VERSION}/cli/php.ini
+sudo sed -i "s/display_errors = .*/display_errors = Off/" /etc/php/${PHP_VERSION}/cli/php.ini
+sudo sed -i "s/memory_limit = .*/memory_limit = 512M/" /etc/php/${PHP_VERSION}/cli/php.ini
+sudo sed -i "s/;date.timezone.*/date.timezone = UTC/" /etc/php/${PHP_VERSION}/cli/php.ini
+sudo sed -i "s/upload_max_filesize = .*/upload_max_filesize = 100M/" /etc/php/${PHP_VERSION}/fpm/php.ini
+sudo sed -i "s/post_max_size = .*/post_max_size = 100M/" /etc/php/${PHP_VERSION}/fpm/php.ini
+sudo sed -i "s/;cgi.fix_pathinfo=1/cgi.fix_pathinfo=0/" /etc/php/${PHP_VERSION}/fpm/php.ini
 sudo mkdir /var/log/sites
 sudo chown www-data:www-data /var/log/sites
 
@@ -55,4 +57,4 @@ sudo mv composer.phar /usr/local/bin/composer
 # Restart services
 msg "Restarting nginx and php-fpm"
 sudo service nginx restart
-sudo service php7.4-fpm restart
+sudo service php${PHP_VERSION}-fpm restart
