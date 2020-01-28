@@ -15,6 +15,8 @@ elif [ -f /etc/site_manager ]; then
     . /etc/site_manager
 fi
 
+PHP_VERSION=7.4
+
 function askForDomain {
     DOMAIN="$1"
     while true; do
@@ -82,6 +84,15 @@ function askForDisplayErrors {
     done
 }
 
+function getSitePhpVersion {
+    SITE_PHP_VERSION=${PHP_VERSION}
+    if [ -f ${SITEROOT}/.php-version ]; then
+        SITE_PHP_VERSION=`cat ${SITEROOT}/.php-version`
+    else
+        echo "${PHP_VERSION}" | sudo tee ${SITEROOT}/.php-version > /dev/null
+    fi
+}
+
 case $1 in
     create)
         askForDomain $2
@@ -92,7 +103,7 @@ case $1 in
         SITEROOT=${SITES_DIR}/${DOMAIN}
         WEBROOT=${SITEROOT}/${PUBLIC_DIR}
         FPM_SOCKET=/var/run/php/${DOMAIN}.sock
-        PHP_POOL=/etc/php/7.4/fpm/pool.d/${DOMAIN}.conf
+        PHP_POOL=/etc/php/${PHP_VERSION}/fpm/pool.d/${DOMAIN}.conf
 
         if ! getent passwd ${DOMAIN} > /dev/null; then
             echo "Creating system user ${DOMAIN}"
@@ -105,6 +116,7 @@ case $1 in
             echo "Creating website root directory at ${SITEROOT}"
             sudo mkdir -p ${WEBROOT}
             echo "Hello World!" | sudo tee ${WEBROOT}/index.php > /dev/null
+            getSitePhpVersion
 
             echo "Changing ownership of all site files to ${DOMAIN}:${DOMAIN}"
             sudo chown -R ${DOMAIN}:${DOMAIN} ${SITEROOT}
@@ -196,10 +208,11 @@ EOF
 
         echo "Restarting services"
         sudo service nginx reload > /dev/null
-        sudo service php7.4-fpm restart > /dev/null
+        sudo service php${PHP_VERSION}-fpm restart > /dev/null
         ;;
     delete)
         askForDomain $2
+        getSitePhpVersion
 
         read -p "Are you sure you want to DELETE it? [y/n]: " yn
 
@@ -209,11 +222,11 @@ EOF
 
         sudo rm /etc/nginx/sites-available/${DOMAIN}.conf
         sudo rm /etc/nginx/sites-enabled/${DOMAIN}.conf
-        sudo rm /etc/php/7.4/fpm/pool.d/${DOMAIN}.conf
+        sudo rm /etc/php/${SITE_PHP_VERSION}/fpm/pool.d/${DOMAIN}.conf
         sudo rm -rf ${LOGS_DIR}/${DOMAIN}
         echo "Deleted configurations for ${DOMAIN}"
         sudo service nginx reload
-        sudo service php7.4-fpm reload
+        sudo service php${SITE_PHP_VERSION}-fpm reload
 
         read -p "Do you want to DELETE site files? [y/n]: " yn
         if [ "${yn}" == "y" ]; then
@@ -223,6 +236,7 @@ EOF
         ;;
     enable)
         askForDomain $2
+        getSitePhpVersion
 
         if [ -f /etc/nginx/sites-available/${DOMAIN}.conf ]; then
             sudo ln -s /etc/nginx/sites-available/${DOMAIN}.conf /etc/nginx/sites-enabled/
@@ -231,15 +245,17 @@ EOF
             echo "Cannot find nginx configuration file for ${DOMAIN}"
         fi
 
-        if [ -f /etc/php/7.4/fpm/pool.d/${DOMAIN}.conf.disabled ]; then
-            sudo mv /etc/php/7.4/fpm/pool.d/${DOMAIN}.conf.disabled /etc/php/7.4/fpm/pool.d/${DOMAIN}.conf
-            sudo service php7.4-fpm reload
+        if [ -f /etc/php/${SITE_PHP_VERSION}/fpm/pool.d/${DOMAIN}.conf.disabled ]; then
+            sudo mv /etc/php/${SITE_PHP_VERSION}/fpm/pool.d/${DOMAIN}.conf.disabled /etc/php/${SITE_PHP_VERSION}/fpm/pool.d/${DOMAIN}.conf
+            sudo service php${SITE_PHP_VERSION}-fpm reload
         else
             echo "Cannot find php-fpm configuration file for ${DOMAIN}"
         fi
         ;;
     disable)
         askForDomain $2
+        getSitePhpVersion
+
         if [ -f /etc/nginx/sites-available/${DOMAIN}.conf ]; then
             sudo rm /etc/nginx/sites-enabled/${DOMAIN}.conf
             sudo service nginx reload
@@ -247,9 +263,9 @@ EOF
             echo "Cannot find nginx configuration file for ${DOMAIN}"
         fi
 
-        if [ -f /etc/php/7.4/fpm/pool.d/${DOMAIN}.conf ]; then
-            sudo mv /etc/php/7.4/fpm/pool.d/${DOMAIN}.conf /etc/php/7.4/fpm/pool.d/${DOMAIN}.conf.disabled
-            sudo service php7.4-fpm reload
+        if [ -f /etc/php/${SITE_PHP_VERSION}/fpm/pool.d/${DOMAIN}.conf ]; then
+            sudo mv /etc/php/${SITE_PHP_VERSION}/fpm/pool.d/${DOMAIN}.conf /etc/php/${SITE_PHP_VERSION}/fpm/pool.d/${DOMAIN}.conf.disabled
+            sudo service php${SITE_PHP_VERSION}-fpm reload
         else
             echo "Cannot find php-fpm configuration file for ${DOMAIN}"
         fi
