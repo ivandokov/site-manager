@@ -138,6 +138,7 @@ server {
     charset utf-8;
 
     access_log /dev/null;
+    log_not_found off;
     error_log ${LOGS_DIR}/${DOMAIN}/nginx.log error;
     error_page 404 /index.php;
 
@@ -145,19 +146,9 @@ server {
         try_files \$uri \$uri/ /index.php?\$query_string;
     }
 
-    location = /favicon.ico { access_log /dev/null; log_not_found off; }
-    location = /robots.txt  { access_log /dev/null; log_not_found off; }
-
-    location ~* \.(?:jpg|jpeg|gif|png|ico|cur|gz|svg|svgz|mp4|ogg|ogv|webm|htc)$ {
-        access_log off;
-        log_not_found off;
+    location ~* \.(?:jpg|jpeg|gif|png|ico|gz|svg|svgz|mp4|ogg|ogv|webm|webp)$ {
         #expires 7d;
         #add_header Cache-Control "public";
-    }
-
-    location ~* \.(?:js|css)$ {
-        access_log off;
-        log_not_found off;
     }
 
     location ~ \.php$ {
@@ -184,10 +175,9 @@ listen.owner = www-data
 listen.group = www-data
 pm = dynamic
 pm.max_children = ${MAX_WORKERS}
-pm.start_servers = ${MIN_WORKERS}
 pm.min_spare_servers = 1
 pm.max_spare_servers = 3
-pm.max_requests = 500
+pm.max_requests = 200
 catch_workers_output = yes
 php_flag[display_errors] = ${DISPLAY_ERRORS}
 php_admin_value[error_log] = ${LOGS_DIR}/${DOMAIN}/php.log
