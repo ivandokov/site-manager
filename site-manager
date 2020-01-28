@@ -315,6 +315,8 @@ EOF
             read -p "New php version: " NEW_PHP_VERSION
             if [ -d /etc/php/${NEW_PHP_VERSION}/fpm ]; then
                 break
+            elif [ "${NEW_PHP_VERSION}" -eq "${OLD_PHP_VERSION}" ]; then
+                echo "The new version cannot be the same as the old version"
             else
                 echo "This php version is not installed"
             fi
