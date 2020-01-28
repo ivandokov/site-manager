@@ -177,9 +177,9 @@ EOF
         fi
 
         if [ -f ${PHP_POOL} ]; then
-            echo "Configuration file for php-fpm already exists"
+            echo "Configuration file for php${SITE_PHP_VERSION}-fpm already exists"
         else
-            echo "Creating php-fpm configuration file"
+            echo "Creating php${SITE_PHP_VERSION}-fpm configuration file"
             sudo tee "${PHP_POOL}" &>/dev/null <<EOF
 [${DOMAIN}]
 user = ${DOMAIN}
@@ -249,7 +249,7 @@ EOF
             sudo mv /etc/php/${SITE_PHP_VERSION}/fpm/pool.d/${DOMAIN}.conf.disabled /etc/php/${SITE_PHP_VERSION}/fpm/pool.d/${DOMAIN}.conf
             sudo service php${SITE_PHP_VERSION}-fpm reload
         else
-            echo "Cannot find php-fpm configuration file for ${DOMAIN}"
+            echo "Cannot find php${SITE_PHP_VERSION}-fpm configuration file for ${DOMAIN}"
         fi
         ;;
     disable)
@@ -267,7 +267,7 @@ EOF
             sudo mv /etc/php/${SITE_PHP_VERSION}/fpm/pool.d/${DOMAIN}.conf /etc/php/${SITE_PHP_VERSION}/fpm/pool.d/${DOMAIN}.conf.disabled
             sudo service php${SITE_PHP_VERSION}-fpm reload
         else
-            echo "Cannot find php-fpm configuration file for ${DOMAIN}"
+            echo "Cannot find php${SITE_PHP_VERSION}-fpm configuration file for ${DOMAIN}"
         fi
         ;;
     *)
