@@ -281,6 +281,7 @@ EOF
         fi
 
         if [ -f /etc/php/${SITE_PHP_VERSION}/fpm/pool.d/${DOMAIN}.conf ]; then
+            echo "Disabling php${SITE_PHP_VERSION}-fpm configuration for ${DOMAIN}"
             sudo mv /etc/php/${SITE_PHP_VERSION}/fpm/pool.d/${DOMAIN}.conf /etc/php/${SITE_PHP_VERSION}/fpm/pool.d/${DOMAIN}.conf.disabled
             sudo service php${SITE_PHP_VERSION}-fpm reload
         else
