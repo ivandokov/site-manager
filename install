@@ -2,41 +2,58 @@
 
 set -e
 
-PHP_VERSION=7.4
+read -p "Which PHP version should be installed? " -i "7.4" -e PHP_VERSION
 
 function msg {
-    echo "========================================"
-    echo "$1"
-    echo "========================================"
+    echo -e "\e[32m$1\e[39m"
 }
 
-msg "Making site-manager globally accessible"
-echo "sudo ln -s $(pwd)/site-manager /usr/local/bin/site-manager"
-sudo ln -s $(pwd)/site-manager /usr/local/bin/site-manager
+if [ ! -L /usr/local/bin/site-manager ]; then
+    msg "Making site-manager globally accessible"
+    echo "sudo ln -s $(pwd)/site-manager /usr/local/bin/site-manager"
+    sudo ln -s $(pwd)/site-manager /usr/local/bin/site-manager
+fi
 
-# Add ppa
-msg "Adding ppa for nginx and php"
-sudo apt-get install software-properties-common -y
-sudo add-apt-repository ppa:nginx/stable -y
-LC_ALL=C.UTF-8 sudo add-apt-repository ppa:ondrej/php -y
+if ! which add-apt-repository > /dev/null; then
+    sudo apt-get install software-properties-common -y
+fi
+
+if ! ls /etc/apt/sources.list.d/ | grep nginx | grep stable > /dev/null; then
+    msg "Adding ppa for nginx"
+    sudo add-apt-repository ppa:nginx/stable -y
+fi
+
+if ! ls /etc/apt/sources.list.d/ | grep ondrej | grep php > /dev/null; then
+    msg "Adding ppa for php"
+    LC_ALL=C.UTF-8 sudo add-apt-repository ppa:ondrej/php -y
+fi
+
 sudo apt-get update
 
-# Install nginx and php
 msg "Installing nginx"
 sudo apt-get install -y nginx
 
 msg "Installing php"
 sudo apt-get install -y php${PHP_VERSION}-fpm php${PHP_VERSION}-cli php${PHP_VERSION}-mysql php${PHP_VERSION}-pgsql php${PHP_VERSION}-curl php${PHP_VERSION}-redis php${PHP_VERSION}-mbstring php${PHP_VERSION}-gd php${PHP_VERSION}-xml php${PHP_VERSION}-zip php${PHP_VERSION}-intl php${PHP_VERSION}-readline php${PHP_VERSION}-json php${PHP_VERSION}-opcache
 
-# Setup nginx
 msg "Setting up nginx"
-sudo rm /etc/nginx/sites-enabled/default
-sudo rm /etc/nginx/sites-available/default
-echo 'fastcgi_param HTTP_PROXY "";' | sudo tee -a /etc/nginx/fastcgi.conf 1> /dev/null
-echo 'fastcgi_param HTTP_PROXY "";' | sudo tee -a /etc/nginx/fastcgi_params 1> /dev/null
-echo 'proxy_set_header Proxy "";' | sudo tee -a /etc/nginx/proxy_params 1> /dev/null
+if [ -f /etc/nginx/sites-enabled/default ]; then
+    sudo rm /etc/nginx/sites-enabled/default
+fi
+if [ -f /etc/nginx/sites-available/default ]; then
+    sudo rm /etc/nginx/sites-available/default
+fi
 
-# Setup php
+if ! grep 'fastcgi_param HTTP_PROXY "";' /etc/nginx/fastcgi.conf > /dev/null; then
+    echo 'fastcgi_param HTTP_PROXY "";' | sudo tee -a /etc/nginx/fastcgi.conf 1> /dev/null
+fi
+if ! grep 'fastcgi_param HTTP_PROXY "";' /etc/nginx/fastcgi_params > /dev/null; then
+    echo 'fastcgi_param HTTP_PROXY "";' | sudo tee -a /etc/nginx/fastcgi_params 1> /dev/null
+fi
+if ! grep 'proxy_set_header Proxy "";' /etc/nginx/proxy_params > /dev/null; then
+    echo 'proxy_set_header Proxy "";' | sudo tee -a /etc/nginx/proxy_params 1> /dev/null
+fi
+
 msg "Setting up php"
 sudo sed -i "s/log_errors = .*/log_errors = On/" /etc/php/${PHP_VERSION}/cli/php.ini
 sudo sed -i "s/error_reporting = .*/error_reporting = E_ALL/" /etc/php/${PHP_VERSION}/cli/php.ini
@@ -46,7 +63,10 @@ sudo sed -i "s/;date.timezone.*/date.timezone = UTC/" /etc/php/${PHP_VERSION}/cl
 sudo sed -i "s/upload_max_filesize = .*/upload_max_filesize = 100M/" /etc/php/${PHP_VERSION}/fpm/php.ini
 sudo sed -i "s/post_max_size = .*/post_max_size = 100M/" /etc/php/${PHP_VERSION}/fpm/php.ini
 sudo sed -i "s/;cgi.fix_pathinfo=1/cgi.fix_pathinfo=0/" /etc/php/${PHP_VERSION}/fpm/php.ini
-sudo mkdir /var/log/sites
+
+if [ ! -d /var/log/sites ]; then
+    sudo mkdir /var/log/sites
+fi
 sudo chown www-data:www-data /var/log/sites
 
 # Install composer
@@ -55,6 +75,6 @@ curl -sS https://getcomposer.org/installer | php
 sudo mv composer.phar /usr/local/bin/composer
 
 # Restart services
-msg "Restarting nginx and php-fpm"
+msg "Restarting nginx and php${PHP_VERSION}-fpm"
 sudo service nginx restart
 sudo service php${PHP_VERSION}-fpm restart
