@@ -328,30 +328,31 @@ EOF
         sudo service php${NEW_PHP_VERSION}-fpm restart
         ;;
     *)
-        echo "NAME
+        printf "NAME
     site-manager
 
 SYNOPSIS
     site-manager [ARGUMENTS]
 
 DESCRIPTION
-    Software tool to manage nginx and php-fpm configuration for websites. \
+    Software tool to manage nginx and php-fpm configuration for websites.
     For more details take a look at https://github.com/ivandokov/site-manager
 
 ARGUMENTS
     create
-        Creates system user, website root, logs and webroot directories, nginx and php-fpm configurations
+        creates system user, website root, logs and webroot directories, nginx and php-fpm configurations
 
     enable
-        Enables nginx virtual host and php-fpm workers
+        enables nginx virtual host and php-fpm workers
 
     disable
-        Disables nginx virtual host and php-fpm workers
+        disables nginx virtual host and php-fpm workers
 
     delete
-        Deletes nginx and php-fpm configurations and optionally deletes the system user and website files
+        deletes nginx and php-fpm configurations and optionally deletes the system user and website files
 
     php
-        Change the php version of the website"
+        change the php version of the website
+"
         ;;
 esac
