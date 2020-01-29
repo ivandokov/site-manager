@@ -2,12 +2,14 @@
 Setup easy and fast nginx and php for a website
 
 ## Installation
-The installer is going to setup latest stable versions of nginx and php
+The installer is going to setup latest stable version of nginx and ask you for the required php version
 ```bash
 git clone https://github.com/ivandokov/site-manager.git
 cd site-manager
 ./install
 ```
+
+**If you want to install more versions of php you can safely run the installer again.**
 
 ## Usage
 
