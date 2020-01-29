@@ -328,6 +328,30 @@ EOF
         sudo service php${NEW_PHP_VERSION}-fpm restart
         ;;
     *)
-        echo "Usage: create|delete|enable|disable|php domain.tld"
+        echo "NAME
+    site-manager
+
+SYNOPSIS
+    site-manager [ARGUMENTS]
+
+DESCRIPTION
+    Software tool to manage nginx and php-fpm configuration for websites. \
+    For more details take a look at https://github.com/ivandokov/site-manager
+
+ARGUMENTS
+    create
+        Creates system user, website root, logs and webroot directories, nginx and php-fpm configurations
+
+    enable
+        Enables nginx virtual host and php-fpm workers
+
+    disable
+        Disables nginx virtual host and php-fpm workers
+
+    delete
+        Deletes nginx and php-fpm configurations and optionally deletes the system user and website files
+
+    php
+        Change the php version of the website"
         ;;
 esac
