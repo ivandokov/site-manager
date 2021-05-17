@@ -163,11 +163,12 @@ server {
 
     location / {
         try_files \$uri \$uri/ /index.php?\$query_string;
+        #try_files \$uri \$uri/ /index.html =404; # for SPAs
     }
 
     location ~* \.(?:jpg|jpeg|gif|png|ico|gz|svg|svgz|mp4|ogg|ogv|webm|webp)$ {
         #expires 7d;
-        #add_header Cache-Control "public";
+        #add_header Cache-Control public;
     }
 
     location ~ \.php$ {
