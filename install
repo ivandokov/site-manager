@@ -2,7 +2,7 @@
 
 set -e
 
-read -p "Which PHP version should be installed? " -i "8.0" -e PHP_VERSION
+read -p "Which PHP version should be installed? " -i "8.1" -e PHP_VERSION
 
 function msg {
     echo -e "\e[32m$1\e[39m"
